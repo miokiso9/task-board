@@ -1,0 +1,51 @@
+# GitHub Pages への自動デプロイワークフロー
+# mainブランチにプッシュするたびに自動でビルド＆公開される
+
+name: GitHub Pagesにデプロイ
+
+on:
+  push:
+    branches: ['main']
+
+# GitHub Pages への書き込み権限を付与
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # ビルドジョブ：Reactアプリをビルドして成果物をアップロード
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ソースコードをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Node.js のセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      - name: アプリをビルド
+        run: npm run build
+
+      - name: ビルド成果物をアップロード
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  # デプロイジョブ：ビルド完了後にGitHub Pagesへ公開
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages にデプロイ
+        uses: actions/deploy-pages@v4
+        id: deployment
