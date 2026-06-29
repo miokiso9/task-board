@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TaskInput from './components/TaskInput'
 import TaskList from './components/TaskList'
 import './App.css'
 
+// ローカルストレージのキー名
+const STORAGE_KEY = 'task-board-tasks'
+
 // アプリ全体のルートコンポーネント
 // タスクの状態管理と操作関数をここで一括管理する
 function App() {
-  // タスクの配列を状態として管理する
-  // 各タスクは { id, text, completed } の形
-  const [tasks, setTasks] = useState([])
+  // 初期値にローカルストレージの保存データを使う（なければ空配列）
+  const [tasks, setTasks] = useState(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) : []
+  })
+
+  // tasksが変わるたびにローカルストレージへ保存する
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+  }, [tasks])
 
   // 新しいタスクを追加する
   const addTask = (text) => {
