@@ -1,0 +1,11 @@
+# 依存パッケージ（容量が大きいためGit管理しない）
+node_modules
+dist
+
+# ローカル環境の設定ファイル
+.env
+.env.local
+.env.*.local
+
+# ビルドキャッシュ
+.vite
